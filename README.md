@@ -1,5 +1,5 @@
 [![Build
-Status](https://travis-ci.org/miriam-goldman/Final_Project_Skeleton.svg?branch=master)](https://travis-ci.org/miriam-goldman/Final_Project_Skeleton)
+Status](https://travis-ci.org/aidanwinters/final.svg?branch=master)](https://travis-ci.org/aidanwinters/final)
 
 Example python project with testing.
 

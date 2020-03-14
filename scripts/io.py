@@ -12,31 +12,23 @@ def read_short_seqs(file):
             seqs.append(line.strip())
     return seqs
 
+#dictionary to go from base to oneHot encoding
 base_encode =  {'A': np.array([0,0,0,0,1]),
                'T': np.array([0,0,0,1,0]),
                'C': np.array([0,0,1,0,0]),
                'G': np.array([0,1,0,0,0]),
                'N': np.array([1,0,0,0,0])}
 
+#dictionary to go from oneHot to Base,
+#Only stores the position of 1 in the one hot encoding
 base_decode = {4:'A', 3:'T', 2:'C', 1:'G',0:'N'}
 
 #convert an array of sequence strings into one-hot encoding
 def strList_oneHotMatr(seq_strs):
     return np.array([np.concatenate([base_encode[base] for base in seq]) for seq in seq_strs])
 
-#takes in a oneHot string representing one base and converts into a base
-def modelOut_toBase(modelOut):
-    #set all values to zero expect the max
-    return base_decode[np.argmax(modelOut)]
 
-def translate(oneHot):
-    # check that sequence length is divisible by 5 in our case
-    if len(oneHot) % len(base_decode) == 0:
-        return [modelOut_toBase(oneHot[x:x+5]) for x in range(0,len(oneHot),len(base_decode))]
-    else:
-        raise ValueError('One Hot Sequence provided has incorrect length.')
-
-#get a dictionary of sequences
+#get a dictionary of sequences using biopython
 def get_neg_dict(neg_file ='data/yeast-upstream-1k-negative.fa'):
 
     neg_dict = {}
@@ -45,8 +37,9 @@ def get_neg_dict(neg_file ='data/yeast-upstream-1k-negative.fa'):
         neg_dict[record.id] = record.seq
 
     return neg_dict
-#if a dictionary is passed, just parse and return sequences
-#else, generate dictionary
+
+# using the dictionary of negative Sequences
+#get the desired number of sequences using numpy sampler (random.choice)
 def get_neg_seqs(neg_dict, num = 137,
                  pos_list = read_short_seqs('data/rap1-lieb-positives.txt'), oneHot = True, seed=0):
 
@@ -59,6 +52,7 @@ def get_neg_seqs(neg_dict, num = 137,
         seq = neg_dict[s]
         is_pos = True
 
+        #make sure that the selection is not found in the positive sequence list
         while is_pos:
             select = np.random.choice(len(seq) - seq_size)
             new_seq = seq[select:select+seq_size]
